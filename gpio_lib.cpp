@@ -27,3 +27,5 @@ static gpiod_line* gpiod_line_new(const std::uint8_t pin)
     gpiod_line* self = gpiod_chip_get_line(chip0, pin);
     return self;
 }
+
+void event_detected()
