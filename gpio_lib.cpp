@@ -1,36 +1,45 @@
 #include "gpio_lib.hpp"
 
-static gpiod_line* gpiod_line_new(const std::uint8_t pin);
+static gpiod_line *gpiod_line_new(const std::uint8_t pin);
 
 /**
- * @brief 
- * 
- * @param pin 
- * @param alias 
- * @return gpiod_line* 
+ * @brief
+ *
+ * @param pin
+ * @param alias
+ * @return gpiod_line*
  */
-static gpiod_line* gpiod_line_new(const std::uint8_t pin)
+static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction direction, const char *alias = nullptr)
 {
-    static gpiod_chip* chip0 = nullptr;
-    if (!chip0) 
+    static gpiod_chip *chip0 = nullptr;
+    if (!chip0)
     {
         chip0 = gpiod_chip_open("/dev/gpiochip0");
     }
-    gpiod_line* self = gpiod_chip_get_line(chip0, pin);
+    gpiod_line *self = gpiod_chip_get_line(chip0, pin);
+
+    if (direction == GPIO_direction::out)
+    {
+        gpiod_line_request_output(self, alias, 0);
+    }
+    else
+    {
+        gpiod_line_request_input(self, alias);
+    }
+
     return self;
 }
 
 /**
  * @brief Constructs a new GPIO OUTPUT object.
- * 
+ *
  * @param pin GPIO pin.
  * @param alias same as object name.
  */
-GPIO::GPIO(const std::uint8_t pin, const char* alias = nullptr)
+GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr)
 {
-    this->line = gpiod_line_new(pin);
+    this->line = gpiod_line_new(pin, GPIO_direction::out, alias);
     this->last_value = 0;
-    gpiod_line_request_output(this->line, alias, 0);
     printf("Initialize output");
     printf("On pin %d\n", pin);
     return;
@@ -38,14 +47,14 @@ GPIO::GPIO(const std::uint8_t pin, const char* alias = nullptr)
 
 /**
  * @brief Construct a new GPIO::GPIO object
- * 
- * @param pin 
- * @param alias 
+ *
+ * @param pin
+ * @param alias
  * @param event_detection rising edge standard value
  */
 GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_detection = GPIO_event::rising)
 {
-    this->line = gpiod_line_new(pin);
+    this->line = gpiod_line_new(pin, GPIO_direction::in, alias);
     this->event_detection = event_detection;
     gpiod_line_request_input(this->line, alias);
     printf("Initialize input\n");
@@ -53,10 +62,10 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_det
 }
 
 /**
- * @brief 
- * 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @return true
+ * @return false
  */
 bool GPIO::event_detected()
 {
@@ -65,42 +74,48 @@ bool GPIO::event_detected()
     this->last_value = current_value;
     if (this->event_detection == GPIO_event::rising)
     {
-        if(current_value && !old_value) return true;
-        else return false;
+        if (current_value && !old_value)
+            return true;
+        else
+            return false;
     }
     else if (this->event_detection == GPIO_event::falling)
     {
-        if(!current_value && old_value) return true;
-        else return false;
+        if (!current_value && old_value)
+            return true;
+        else
+            return false;
     }
     else if (this->event_detection == GPIO_event::both)
     {
-        if(current_value != old_value) return true;
-        else return false;
-    } 
-    
+        if (current_value != old_value)
+            return true;
+        else
+            return false;
+    }
+
     return false;
 }
 
 /**
- * @brief 
- * 
- * @param blink_speed 
+ * @brief
+ *
+ * @param blink_speed
  */
 void GPIO::blink(const uint16_t blink_speed)
 {
     uint32_t seconds = blink_speed * 1000000;
-    gpiod_line_set_value(this->line, 1);
+    on();
     usleep(seconds);
-    gpiod_line_set_value(this->line, 0);
+    off();
     usleep(seconds);
     printf("Blink mf\n");
     return;
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void GPIO::on()
 {
@@ -115,18 +130,18 @@ void GPIO::off()
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void GPIO::toggle()
 {
     bool current_value = gpiod_line_get_value(this->line);
 
-    if(current_value == 1)
+    if (current_value == 1)
     {
-        off();        
+        off();
     }
-    else if(current_value == 0)
+    else if (current_value == 0)
     {
         on();
     }
