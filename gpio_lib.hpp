@@ -25,12 +25,13 @@ enum class GPIO_direction
 class GPIO
 {
 protected:
+
+
+public: /* Medlemsfunktioner: */
    struct gpiod_line *line = nullptr; /* GPIO-linjepekare. */
    GPIO_direction direction;
    bool last_value;
    GPIO_event event_detection;
-
-public: /* Medlemsfunktioner: */
    GPIO(void) {}
    ~GPIO(void) { gpiod_line_release(this->line); }
    GPIO(const std::uint8_t pin, const char *alias); // Konstruktor för output
