@@ -40,8 +40,14 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr)
 {
     this->line = gpiod_line_new(pin, GPIO_direction::out, alias);
     this->last_value = 0;
-    printf("Initialize output");
-    printf("On pin %d\n", pin);
+    printf("Initialize output\n");
+    if (!this->line)
+    {
+        printf("Line is null\n");
+    }
+    else
+        printf("Hallelujah, linje is here\n");
+    printf("On pin %d\n\n", pin);
     return;
 }
 
@@ -56,8 +62,9 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_det
 {
     this->line = gpiod_line_new(pin, GPIO_direction::in, alias);
     this->event_detection = event_detection;
-    gpiod_line_request_input(this->line, alias);
+    //gpiod_line_request_input(this->line, alias);
     printf("Initialize input\n");
+    printf("On pin %d\n\n", pin);
     return;
 }
 
@@ -105,9 +112,9 @@ bool GPIO::event_detected()
 void GPIO::blink(const uint16_t blink_speed)
 {
     uint32_t seconds = blink_speed * 1000000;
-    on();
+    this->on();
     usleep(seconds);
-    off();
+    this->off();
     usleep(seconds);
     printf("Blink mf\n");
     return;
@@ -119,7 +126,9 @@ void GPIO::blink(const uint16_t blink_speed)
  */
 void GPIO::on()
 {
-    gpiod_line_set_value(this->line, 1);
+    if (!this->line)
+        printf("NULLPTR in GPIO::ON");
+    printf("%d\n", gpiod_line_set_value(this->line, 1));
     return;
 }
 
