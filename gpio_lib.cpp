@@ -26,7 +26,7 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction d
     {
         gpiod_line_request_input(self, alias);
     }
-
+   
     return self;
 }
 
@@ -39,15 +39,14 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction d
 GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr)
 {
     this->line = gpiod_line_new(pin, GPIO_direction::out, alias);
+    
     this->last_value = 0;
     printf("Initialize output\n");
     if (!this->line)
     {
         printf("Line is null\n");
     }
-    else
-        printf("Hallelujah, linje is here\n");
-    printf("On pin %d\n\n", pin);
+   
     return;
 }
 
@@ -126,9 +125,18 @@ void GPIO::blink(const uint16_t blink_speed)
  */
 void GPIO::on()
 {
+   
+    gpiod_line_set_value(this->line,1);
+    
+    /*
     if (!this->line)
         printf("NULLPTR in GPIO::ON");
-    printf("%d\n", gpiod_line_set_value(this->line, 1));
+    if(gpiod_line_set_value(this->line, 1) == 0)
+    {
+        printf("Great succes");
+    }
+    */
+    //printf("%d\n", gpiod_line_set_value(this->line, 1));
     return;
 }
 

@@ -9,6 +9,7 @@
 #include <gpiod.h>
 #include <unistd.h>
 
+
 enum class GPIO_event
 {
    rising,
@@ -33,7 +34,7 @@ public: /* Medlemsfunktioner: */
    bool last_value;
    GPIO_event event_detection;
    GPIO(void) {}
-   ~GPIO(void) { gpiod_line_release(this->line); }
+   ~GPIO(void) { std::cout << "hej"; gpiod_line_release(this->line); }
    GPIO(const std::uint8_t pin, const char *alias); // Konstruktor för output
    GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_detection);
    bool event_detected();
@@ -42,5 +43,7 @@ public: /* Medlemsfunktioner: */
    void off();
    void toggle();
 };
+
+
 
 #endif /* GPIOD_LIB_HPP_ */

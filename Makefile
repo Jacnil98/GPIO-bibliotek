@@ -1,7 +1,7 @@
 all: build run
 
 build:
-	g++ *.cpp -o main -Wall -Wextra -l gpiod 
+	g++ *.cpp -o main -Wall -l gpiod
 
 run:
 	./main
