@@ -6,8 +6,8 @@
 #include <thread>
 #include <cstdint>
 
-#include <gpiod.hpp>
-//#include <unistd.h>
+#include <gpiod.h>
+#include <unistd.h>
 
 enum class GPIO_event
 {
@@ -28,7 +28,7 @@ protected:
    struct gpiod_line *line = nullptr; /* GPIO-linjepekare. */
    GPIO_direction direction;
    bool last_value;
-   const GPIO_event event_detection;
+   GPIO_event event_detection;
 
 public: /* Medlemsfunktioner: */
    GPIO(void) {}
@@ -36,7 +36,6 @@ public: /* Medlemsfunktioner: */
    GPIO(const std::uint8_t pin, const char *alias); // Konstruktor för output
    GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_detection);
    bool event_detected();
-   void toggle();
    void blink(const uint16_t blink_speed);
    void on();
    void off();

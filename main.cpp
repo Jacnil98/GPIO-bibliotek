@@ -1,9 +1,10 @@
-#include "gpiod_lib.hpp"
+#include "gpio_lib.hpp"
 
 int main(void)
 {
+    GPIO led1;
     //GPIO::GPIO(const std::uint8_t pin, const char* alias = nullptr)
-    GPIO::led1(17, "led1");
+    led1 = GPIO(17, "led1");
     while (true)
     {
         led1.blink(2);

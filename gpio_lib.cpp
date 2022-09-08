@@ -14,7 +14,7 @@ static gpiod_line* gpiod_line_new(const std::uint8_t pin)
     static gpiod_chip* chip0 = nullptr;
     if (!chip0) 
     {
-        chip0 = gpiod_chip_open("/dev/gpiodchip0");
+        chip0 = gpiod_chip_open("/dev/gpiochip0");
     }
     gpiod_line* self = gpiod_chip_get_line(chip0, pin);
     return self;
@@ -31,6 +31,8 @@ GPIO::GPIO(const std::uint8_t pin, const char* alias = nullptr)
     this->line = gpiod_line_new(pin);
     this->last_value = 0;
     gpiod_line_request_output(this->line, alias, 0);
+    printf("Initialize output");
+    printf("On pin %d\n", pin);
     return;
 }
 
@@ -41,11 +43,12 @@ GPIO::GPIO(const std::uint8_t pin, const char* alias = nullptr)
  * @param alias 
  * @param event_detection rising edge standard value
  */
-GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_detection = rising)
+GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_detection = GPIO_event::rising)
 {
     this->line = gpiod_line_new(pin);
     this->event_detection = event_detection;
     gpiod_line_request_input(this->line, alias);
+    printf("Initialize input\n");
     return;
 }
 
@@ -65,12 +68,12 @@ bool GPIO::event_detected()
         if(current_value && !old_value) return true;
         else return false;
     }
-    else if (this->event_detection == GPIO_eventfalling)
+    else if (this->event_detection == GPIO_event::falling)
     {
         if(!current_value && old_value) return true;
         else return false;
     }
-    else if (this->event_detection == both)
+    else if (this->event_detection == GPIO_event::both)
     {
         if(current_value != old_value) return true;
         else return false;
@@ -86,11 +89,13 @@ bool GPIO::event_detected()
  */
 void GPIO::blink(const uint16_t blink_speed)
 {
-    blink_speed *= 1000;
+    uint32_t seconds = blink_speed * 1000000;
     gpiod_line_set_value(this->line, 1);
-    usleep(blink_speed);
+    usleep(seconds);
     gpiod_line_set_value(this->line, 0);
-    usleep(blink_speed);
+    usleep(seconds);
+    printf("Blink mf\n");
+    return;
 }
 
 /**
@@ -100,18 +105,20 @@ void GPIO::blink(const uint16_t blink_speed)
 void GPIO::on()
 {
     gpiod_line_set_value(this->line, 1);
+    return;
 }
 
 void GPIO::off()
 {
     gpiod_line_set_value(this->line, 0);
+    return;
 }
 
 /**
  * @brief 
  * 
  */
-void GPIO::toggle
+void GPIO::toggle()
 {
     bool current_value = gpiod_line_get_value(this->line);
 

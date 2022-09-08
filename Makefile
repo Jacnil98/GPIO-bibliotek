@@ -1,4 +1,7 @@
-@all build make run
+all: build run
 
-make:
-	g++ *.cpp -o main -l gpiodcxx
+build:
+	g++ *.cpp -o main -Wall -Wextra -l gpiod 
+
+run:
+	./main
