@@ -3,11 +3,10 @@
 static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_enum::direction direction, const char *alias);
 
 /**
- * @brief
+ * @brief Creates a nre instance of the class GPIO.
  *
  * @param pin
  * @param alias
- * @return gpiod_line*
  */
 static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_enum::direction direction, const char *alias = nullptr)
 {
@@ -51,7 +50,7 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr)
 }
 
 /**
- * @brief Construct a new GPIO::GPIO object
+ * @brief Construct a new GPIO input object
  *
  * @param pin
  * @param alias
@@ -67,7 +66,7 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_enum::event eve
 }
 
 /**
- * @brief
+ * @brief Detectes if a input changed state
  *
  * @return true
  * @return false
@@ -95,9 +94,9 @@ bool GPIO::event_detected()
 }
 
 /**
- * @brief
+ * @brief Blinks the output
  *
- * @param blink_speed
+ * @param blink_speed Wished time between blinks in ms
  */
 void GPIO::blink(const uint16_t blink_speed)
 {
@@ -110,7 +109,7 @@ void GPIO::blink(const uint16_t blink_speed)
 }
 
 /**
- * @brief
+ * @brief Turns on output
  *
  */
 void GPIO::on()
@@ -120,6 +119,10 @@ void GPIO::on()
     return;
 }
 
+/**
+ * @brief Turns off output
+ * 
+ */
 void GPIO::off()
 {
     gpiod_line_set_value(this->line, 0);
@@ -127,7 +130,7 @@ void GPIO::off()
 }
 
 /**
- * @brief
+ * @brief Toggles the output
  *
  */
 void GPIO::toggle()

@@ -8,6 +8,10 @@
 #include <gpiod.h>
 #include <unistd.h>
 
+/**
+ * @brief 
+ * 
+ */
 namespace GPIO_enum
 {
    enum class event
@@ -30,6 +34,12 @@ namespace GPIO_enum
    };
 };
 
+/**
+ * @brief GPIO class defintion
+ *
+ * @param direction The direction of the Pin
+ * @param event_detection Edge detection defintion
+ */
 class GPIO
 {
 protected:   
@@ -38,17 +48,16 @@ public:                               /* Medlemsfunktioner: */
    struct gpiod_line *line = nullptr; /* GPIO-linjepekare. */
    GPIO_enum::direction direction;
    uint8_t last_value;
-   //bool enabled;
    GPIO_enum::event event_detection;
 
    GPIO(void) {}
-   ~GPIO(void)
+   ~GPIO(void) /* Destructor */
    {
       std::cout << "Destructor called\n";
       gpiod_line_release(this->line);
    }
-   GPIO(const std::uint8_t pin, const char *alias); // Konstruktor för output
-   GPIO(const std::uint8_t pin, const char *alias, const GPIO_enum::event event_detection);
+   GPIO(const std::uint8_t pin, const char *alias); /* Constructor for output */
+   GPIO(const std::uint8_t pin, const char *alias, const GPIO_enum::event event_detection); /* Constructor for input */
    bool event_detected();
    void blink(const uint16_t blink_speed);
    void on();

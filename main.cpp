@@ -10,19 +10,27 @@ GPIO led4(24, "led4");
 GPIO button1(27, "button1", GPIO_enum::event::rising);
 GPIO button2(25, "button2", GPIO_enum::event::rising);
 
+/**
+ * @authors Jacob Nilsson & Jacob Lundkvist. 
+ * 
+ *
+ * @brief 
+ * 
+ */
+int main(void)
+{
+    std::thread t1(led_controll, led1, led2, button1, 1);
+    std::thread t2(led_controll, led3, led4, button2, 5);
+    t1.join();
+    t2.join();
 
-/*
-const std::vector<GPIO>& leds1 =
+    while (true)
     {
-        led1,
-        led2
-    };
 
-std::vector<GPIO> leds2 =
-    {
-        led3,
-        led4}; 
-        */
+    }
+
+    return 0;
+}
 
 /**
  * @brief
@@ -57,22 +65,6 @@ static void led_controll(GPIO led1, GPIO led2, GPIO button, const std::size_t bl
     }
     return;
 }
-
-int main(void)
-{
-    std::thread t1(led_controll, led1, led2, button1, 1);
-    std::thread t2(led_controll, led3, led4, button2, 5);
-    t1.join();
-    t2.join();
-
-    while (true)
-    {
-
-    }
-
-    return 0;
-}
-
 
 /** 
  * @brief  KVAR ATT GÖRA:
