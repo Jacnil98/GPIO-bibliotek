@@ -1,6 +1,6 @@
 #include "gpio_lib.hpp"
 
-static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction direction, const char *alias);
+static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_enum::direction direction, const char *alias);
 
 /**
  * @brief
@@ -9,7 +9,7 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction d
  * @param alias
  * @return gpiod_line*
  */
-static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction direction, const char *alias = nullptr)
+static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_enum::direction direction, const char *alias = nullptr)
 {
     static gpiod_chip *chip0 = nullptr;
     if (!chip0)
@@ -18,7 +18,7 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction d
     }
     gpiod_line *self = gpiod_chip_get_line(chip0, pin);
 
-    if (direction == GPIO_direction::out)
+    if (direction == GPIO_enum::direction::out)
     {
         gpiod_line_request_output(self, alias, 0);
     }
@@ -26,7 +26,7 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction d
     {
         gpiod_line_request_input(self, alias);
     }
-   
+
     return self;
 }
 
@@ -38,15 +38,15 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_direction d
  */
 GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr)
 {
-    this->line = gpiod_line_new(pin, GPIO_direction::out, alias);
-    
+    this->line = gpiod_line_new(pin, GPIO_enum::direction::out, alias);
+
     this->last_value = 0;
     printf("Initialize output\n");
     if (!this->line)
     {
         printf("Line is null\n");
     }
-   
+
     return;
 }
 
@@ -57,11 +57,10 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr)
  * @param alias
  * @param event_detection rising edge standard value
  */
-GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_detection = GPIO_event::rising)
+GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_enum::event event_detection)
 {
-    this->line = gpiod_line_new(pin, GPIO_direction::in, alias);
+    this->line = gpiod_line_new(pin, GPIO_enum::direction::in, alias);
     this->event_detection = event_detection;
-    //gpiod_line_request_input(this->line, alias);
     printf("Initialize input\n");
     printf("On pin %d\n\n", pin);
     return;
@@ -75,32 +74,24 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_event event_det
  */
 bool GPIO::event_detected()
 {
-    const bool old_value = this->last_value;
-    const bool current_value = gpiod_line_get_value(this->line); // Ta reda på current value
+    const auto old_value = this->last_value;
+    const auto current_value = gpiod_line_get_value(this->line);
     this->last_value = current_value;
-    if (this->event_detection == GPIO_event::rising)
+    if (current_value == old_value) return false;
+    usleep(50000);
+    // static uint8_t current_value = gpiod_line_get_value(this->line); // Ta reda på current value
+    // printf("Button value %d\nCurrent value is: %d\n",gpiod_line_get_value(this->line) ,current_value);
+    if (this->event_detection == GPIO_enum::event::rising && current_value && !old_value)
     {
-        if (current_value && !old_value)
-            return true;
-        else
-            return false;
+        printf("TRUE\n");
+        return true;
     }
-    else if (this->event_detection == GPIO_event::falling)
-    {
-        if (!current_value && old_value)
-            return true;
-        else
-            return false;
-    }
-    else if (this->event_detection == GPIO_event::both)
-    {
-        if (current_value != old_value)
-            return true;
-        else
-            return false;
-    }
-
-    return false;
+    else if (this->event_detection == GPIO_enum::event::falling && !current_value && old_value)
+        return true;
+    else if (this->event_detection == GPIO_enum::event::both && current_value != old_value)
+        return true;
+    else
+        return false;
 }
 
 /**
@@ -110,12 +101,11 @@ bool GPIO::event_detected()
  */
 void GPIO::blink(const uint16_t blink_speed)
 {
-    uint32_t seconds = blink_speed * 1000000;
+    uint32_t seconds = blink_speed * 100000;
     this->on();
     usleep(seconds);
     this->off();
     usleep(seconds);
-    printf("Blink mf\n");
     return;
 }
 
@@ -125,18 +115,8 @@ void GPIO::blink(const uint16_t blink_speed)
  */
 void GPIO::on()
 {
-   
-    gpiod_line_set_value(this->line,1);
-    
-    /*
-    if (!this->line)
-        printf("NULLPTR in GPIO::ON");
-    if(gpiod_line_set_value(this->line, 1) == 0)
-    {
-        printf("Great succes");
-    }
-    */
-    //printf("%d\n", gpiod_line_set_value(this->line, 1));
+
+    gpiod_line_set_value(this->line, 1);
     return;
 }
 
@@ -162,5 +142,6 @@ void GPIO::toggle()
     {
         on();
     }
+
     return;
 }
