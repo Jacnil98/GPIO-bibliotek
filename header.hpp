@@ -1,6 +1,7 @@
 #ifndef _HEADER_HPP_
 #define _HEADER_HPP_
 
+/* Include directives */
 #include <iostream>
 #include <thread>
 #include <cstdint>

@@ -1,12 +1,8 @@
 #ifndef GPIOD_LIB_HPP_
 #define GPIOD_LIB_HPP_
 
-/* Inkluderingsdirektiv: */
-#include <iostream>
-#include <thread>
-#include <cstdint>
-#include <gpiod.h>
-#include <unistd.h>
+/* Include directives */
+#include "header.hpp"
 
 /**
  * @brief 
@@ -35,10 +31,10 @@ namespace GPIO_enum
 };
 
 /**
- * @brief GPIO class defintion
+ * @brief GPIO class defintion.
  *
- * @param direction The direction of the Pin
- * @param event_detection Edge detection defintion
+ * @param direction The direction of the Pin.
+ * @param event_detection Edge detection defintion.
  */
 class GPIO
 {

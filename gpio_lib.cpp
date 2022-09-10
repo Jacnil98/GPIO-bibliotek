@@ -3,10 +3,10 @@
 static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_enum::direction direction, const char *alias);
 
 /**
- * @brief Creates a nre instance of the class GPIO.
+ * @brief Creates a new instance of the class GPIO.
  *
- * @param pin
- * @param alias
+ * @param pin GPIO pin.
+ * @param alias same as object name.
  */
 static gpiod_line *gpiod_line_new(const std::uint8_t pin, const GPIO_enum::direction direction, const char *alias = nullptr)
 {
@@ -52,9 +52,9 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr)
 /**
  * @brief Construct a new GPIO input object
  *
- * @param pin
- * @param alias
- * @param event_detection rising edge standard value
+ * @param pin GPIO pin.
+ * @param alias same as object name.
+ * @param event_detection rising edge standard value.
  */
 GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_enum::event event_detection)
 {
@@ -66,10 +66,8 @@ GPIO::GPIO(const std::uint8_t pin, const char *alias, const GPIO_enum::event eve
 }
 
 /**
- * @brief Detectes if a input changed state
+ * @brief Detectes if a input changed state.
  *
- * @return true
- * @return false
  */
 bool GPIO::event_detected()
 {
@@ -78,11 +76,8 @@ bool GPIO::event_detected()
     this->last_value = current_value;
     if (current_value == old_value) return false;
     usleep(50000);
-    // static uint8_t current_value = gpiod_line_get_value(this->line); // Ta reda på current value
-    // printf("Button value %d\nCurrent value is: %d\n",gpiod_line_get_value(this->line) ,current_value);
     if (this->event_detection == GPIO_enum::event::rising && current_value && !old_value)
     {
-        printf("TRUE\n");
         return true;
     }
     else if (this->event_detection == GPIO_enum::event::falling && !current_value && old_value)
@@ -94,9 +89,9 @@ bool GPIO::event_detected()
 }
 
 /**
- * @brief Blinks the output
+ * @brief Blinks the output.
  *
- * @param blink_speed Wished time between blinks in ms
+ * @param blink_speed Wished time between blinks in ms.
  */
 void GPIO::blink(const uint16_t blink_speed)
 {
@@ -109,7 +104,7 @@ void GPIO::blink(const uint16_t blink_speed)
 }
 
 /**
- * @brief Turns on output
+ * @brief Turns on output.
  *
  */
 void GPIO::on()
@@ -120,7 +115,7 @@ void GPIO::on()
 }
 
 /**
- * @brief Turns off output
+ * @brief Turns off output.
  * 
  */
 void GPIO::off()
@@ -130,7 +125,7 @@ void GPIO::off()
 }
 
 /**
- * @brief Toggles the output
+ * @brief Toggles the output.
  *
  */
 void GPIO::toggle()

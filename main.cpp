@@ -1,7 +1,9 @@
-#include "header.hpp"
+#include "gpio_lib.hpp"
 
+/* Sets object to extern */
 extern GPIO led1, led2, led3, led4, button1, button2;
 
+/* Creates object of GPIO class  */
 GPIO led1(17, "led1");
 GPIO led2(22, "led2");
 GPIO led3(23, "led3");
@@ -14,7 +16,8 @@ GPIO button2(25, "button2", GPIO_enum::event::rising);
  * @authors Jacob Nilsson & Jacob Lundkvist. 
  * 
  *
- * @brief 
+ * @brief Construct a multi threaded program. The program consist of two threads that 
+ * controlls different leds and buttons simultaneously with the help of libgpiod.
  * 
  */
 int main(void)
@@ -33,24 +36,20 @@ int main(void)
 }
 
 /**
- * @brief
- * @details Anslut fyra lysdioder till PIN 17, 22, 23 och 24 samt två tryckknappar till PIN 25 samt 27. Varje tryckknapp skall styra två
- *  lysdioder via var sin tråd, där lysdioderna skall togglas mellan att blinka och vara släckta vid stigande flank på motsvarande
- *  tryckknapp. Varannan knapptryckning börjar alltså lysdioderna blinka, annars hålls de släckta.
+ * @brief 
+ * @details Connects four leds to PIN 17, 22, 23 and 24 and two buttons to PIN 25 and 27. 
+ * The two buttons is gonna controll two leds each with the help of a thread. The leds are gonna switch between blinking and be off. 
+ * On every rising edge the mode is gonna switch. 
  *
- * @return int
  */
 static void led_controll(GPIO led1, GPIO led2, GPIO button, const std::size_t blink_delay)
 {
     static bool enabled = 0;
     while (true)
     {
-        
         if (button.event_detected())
         {
             enabled = !enabled;
-            std::cout << enabled;
-            std::cout << "\nButton event detected\n";
         }
         if (enabled)
         {
