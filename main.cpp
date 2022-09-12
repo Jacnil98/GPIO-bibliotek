@@ -6,7 +6,7 @@ static void led_controll(GPIO led1, GPIO led2, GPIO button, const std::size_t bl
 
 
 /* Creates object of GPIO class  */
-GPIO led1(17, "led1");
+GPIO led1(17, "led1", GPIO_enum::activeSignal::high, 0);
 GPIO led2(22, "led2", GPIO_enum::activeSignal::high, 0);
 GPIO led3(23, "led3", GPIO_enum::activeSignal::high, 0);
 GPIO led4(24, "led4", GPIO_enum::activeSignal::high, 0);
