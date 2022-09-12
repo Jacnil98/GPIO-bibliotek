@@ -9,8 +9,8 @@
 #include <unistd.h>
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 namespace GPIO_enum
 {
@@ -23,8 +23,8 @@ namespace GPIO_enum
 
    enum class direction
    {
-      in,
-      out
+      input,
+      output
    };
 
    enum class activeSignal
@@ -42,20 +42,23 @@ namespace GPIO_enum
  */
 class GPIO
 {
-protected:
-   GPIO_enum::direction direction;
-   GPIO_enum::event event_detection;
-   uint8_t last_value;
-public:                               /* Medlemsfunktioner: */
-   struct gpiod_line *line = nullptr; /* GPIO-linjepekare. */
+private:
+   struct gpiod_line *line = nullptr;
+   GPIO_enum::direction direction = GPIO_enum::direction::output;
+   GPIO_enum::event event_detection = GPIO_enum::event::rising;
+   uint8_t last_value = 0;
+
+public: /* Medlemsfunktioner: */
+        /* GPIO-linjepekare. */
    GPIO(void) {}
    ~GPIO(void) /* Destructor */
    {
       std::cout << "Destructor called for" << this->line;
       gpiod_line_release(this->line);
    }
-   GPIO(const std::uint8_t pin, const char *alias, GPIO_enum::activeSignal active_signal, bool default_val); /* Constructor for output */
-   GPIO(const std::uint8_t pin, const char *alias, GPIO_enum::activeSignal active_signal, const GPIO_enum::event event_detection); /* Constructor for input */
+   GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias,
+        GPIO_enum::activeSignal active_signal, const GPIO_enum::event event_detection, bool default_val);
+
    bool read_input();
    void blink(const uint16_t blink_speed);
    void on();

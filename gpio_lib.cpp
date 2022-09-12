@@ -1,7 +1,6 @@
 #include "gpio_lib.hpp"
 
-
-static gpiod_line *gpiod_line_new(const std::uint8_t pin, const char *alias);
+static gpiod_line *gpiod_line_new(const std::uint8_t pin);
 
 /**
  * @brief Creates a new instance of the class GPIO.
@@ -9,7 +8,7 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const char *alias);
  * @param pin GPIO pin.
  * @param alias same as object name.
  */
-static gpiod_line *gpiod_line_new(const std::uint8_t pin, const char *alias = nullptr)
+static gpiod_line *gpiod_line_new(const std::uint8_t pin)
 {
     static gpiod_chip *chip0 = nullptr;
     if (!chip0)
@@ -21,56 +20,56 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin, const char *alias = nu
 }
 
 /**
- * @brief Constructs a new GPIO OUTPUT object.
- *
- * @param pin GPIO pin.
- * @param alias same as object name.
+ * @brief Construct a new GPIO::GPIO object of either input or output, first IO_direction and PIN is required.
+ * Default values are applied if constructor is not filled out.
+ * 
+ * @param IO_direction (both) GPIO_enum for selecting input/output.
+ * @param pin (both) GPIO pin on raspberry 4.
+ * @param alias (both) Mame for object as a string.
+ * @param active_signal (both) GPIO_enum, default high, set to low to invert function of pin.
+ * @param event_detection (input) GPIO_enum rising default, else falling or both
+ * @param default_val (output) boolean, start value for output, on = 1.
  */
-GPIO::GPIO(const std::uint8_t pin, const char *alias = nullptr, GPIO_enum::activeSignal active_signal = GPIO_enum::activeSignal::high, bool default_val = 0)
+GPIO::GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias = nullptr,
+           GPIO_enum::activeSignal active_signal = GPIO_enum::activeSignal::high,
+           GPIO_enum::event event_detection = GPIO_enum::event::rising, bool default_val = 0)
 {
-    this->line = gpiod_line_new(pin, alias);
+    this->line = gpiod_line_new(pin);
     if (!this->line)
     {
-        printf ("ERROR, Line is null\n");
+        std::cerr << "ERROR, Line for pin" << std::to_string(pin) << "is null\n";
         return;
     }
-    this->last_value = 0;
-    
-    if (active_signal == GPIO_enum::activeSignal::high)
+    /* Configure output */
+    if (IO_direction == GPIO_enum::direction::output)
     {
-        gpiod_line_request_output(this->line, alias, default_val);
-        std::cout << "active high\n";
+        if (active_signal == GPIO_enum::activeSignal::high)
+        {
+            gpiod_line_request_output(this->line, alias, default_val);
+            std::cout << "Output is set to active high on pin: " << std::to_string(pin) << std::endl;
+        }
+        else
+        {
+            gpiod_line_request_output_flags(this->line, alias, GPIOD_LINE_REQUEST_FLAG_ACTIVE_LOW, default_val);
+            std::cout << "Output is set to active low on pin: " << std::to_string(pin) << std::endl;
+        }
     }
+    /* Configure input */
     else
     {
-        std::cout << gpiod_line_request_output_flags(this->line, alias, GPIOD_LINE_REQUEST_FLAG_ACTIVE_LOW, default_val);
+        this->event_detection = event_detection;
+        if (active_signal == GPIO_enum::activeSignal::high)
+        {
+            gpiod_line_request_input(this->line, alias);
+            std::cout << "Input is set to active high on pin: " << std::to_string(pin) << std::endl;
+        }
+        else
+        {
+            gpiod_line_request_input_flags(this->line, alias, GPIOD_LINE_REQUEST_FLAG_ACTIVE_LOW);
+            std::cout << "Input is set to active low on pin: " << std::to_string(pin) << std::endl;
+        }
     }
-    printf("Initialize output on pin %d\n", pin);
 
-    return;
-}
-
-/**
- * @brief Construct a new GPIO input object
- *
- * @param pin GPIO pin.
- * @param alias same as object name.
- * @param event_detection rising edge standard value.
- */
-GPIO::GPIO(const std::uint8_t pin, const char *alias, GPIO_enum::activeSignal active_signal, const GPIO_enum::event event_detection)
-{
-    this->line = gpiod_line_new(pin, alias);
-    this->event_detection = event_detection;
-    if (active_signal == GPIO_enum::activeSignal::high)
-    {
-        gpiod_line_request_input(this->line, alias);
-    }
-    else
-    {
-        gpiod_line_request_input_flags(this->line, alias, GPIOD_LINE_REQUEST_FLAG_ACTIVE_LOW);
-    }
-    printf("Initialize input\n");
-    printf("On pin %d\n\n", pin);
     return;
 }
 
@@ -83,7 +82,8 @@ bool GPIO::read_input()
     const auto old_value = this->last_value;
     const auto current_value = gpiod_line_get_value(this->line);
     this->last_value = current_value;
-    if (current_value == old_value) return false;
+    if (current_value == old_value)
+        return false;
     usleep(50000);
     if (this->event_detection == GPIO_enum::event::rising && current_value && !old_value)
     {
@@ -125,7 +125,7 @@ void GPIO::on()
 
 /**
  * @brief Turns off output.
- * 
+ *
  */
 void GPIO::off()
 {
