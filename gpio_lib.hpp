@@ -2,7 +2,11 @@
 #define GPIOD_LIB_HPP_
 
 /* Include directives */
-#include "header.hpp"
+#include <iostream>
+#include <thread>
+#include <cstdint>
+#include <gpiod.h>
+#include <unistd.h>
 
 /**
  * @brief 
@@ -38,23 +42,21 @@ namespace GPIO_enum
  */
 class GPIO
 {
-protected:   
-
+protected:
+   GPIO_enum::direction direction;
+   GPIO_enum::event event_detection;
+   uint8_t last_value;
 public:                               /* Medlemsfunktioner: */
    struct gpiod_line *line = nullptr; /* GPIO-linjepekare. */
-   GPIO_enum::direction direction;
-   uint8_t last_value;
-   GPIO_enum::event event_detection;
-
    GPIO(void) {}
    ~GPIO(void) /* Destructor */
    {
-      std::cout << "Destructor called\n";
+      std::cout << "Destructor called for" << this->line;
       gpiod_line_release(this->line);
    }
-   GPIO(const std::uint8_t pin, const char *alias); /* Constructor for output */
-   GPIO(const std::uint8_t pin, const char *alias, const GPIO_enum::event event_detection); /* Constructor for input */
-   bool event_detected();
+   GPIO(const std::uint8_t pin, const char *alias, GPIO_enum::activeSignal active_signal, bool default_val); /* Constructor for output */
+   GPIO(const std::uint8_t pin, const char *alias, GPIO_enum::activeSignal active_signal, const GPIO_enum::event event_detection); /* Constructor for input */
+   bool read_input();
    void blink(const uint16_t blink_speed);
    void on();
    void off();
