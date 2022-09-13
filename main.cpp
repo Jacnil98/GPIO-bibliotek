@@ -35,9 +35,7 @@ int main(void)
     std::vector<GPIO*> leds1 =
     {
         &led1,
-        &led2,
-        &led3,
-        &led4
+        &led2
     };
 
     std::vector<GPIO*> leds2 =
