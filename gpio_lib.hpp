@@ -49,6 +49,7 @@ private:
    uint8_t last_value = 0;
 
 public: /* Medlemsfunktioner: */
+   bool value = 0; 
         /* GPIO-linjepekare. */
    GPIO(void) {}
    ~GPIO(void) /* Destructor */
@@ -56,8 +57,10 @@ public: /* Medlemsfunktioner: */
       std::cout << "Destructor called for" << this->line;
       gpiod_line_release(this->line);
    }
-   GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias,
-        GPIO_enum::activeSignal active_signal, const GPIO_enum::event event_detection, bool default_val);
+
+   GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias = nullptr,
+        GPIO_enum::activeSignal active_signal = GPIO_enum::activeSignal::high, 
+        const GPIO_enum::event event_detection = GPIO_enum::event::rising, bool default_val = 0);
 
    bool read_input();
    void blink(const uint16_t blink_speed);

@@ -30,14 +30,13 @@ static gpiod_line *gpiod_line_new(const std::uint8_t pin)
  * @param event_detection (input) GPIO_enum rising default, else falling or both
  * @param default_val (output) boolean, start value for output, on = 1.
  */
-GPIO::GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias = nullptr,
-           GPIO_enum::activeSignal active_signal = GPIO_enum::activeSignal::high,
-           GPIO_enum::event event_detection = GPIO_enum::event::rising, bool default_val = 0)
+GPIO::GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias,
+           GPIO_enum::activeSignal active_signal, GPIO_enum::event event_detection, bool default_val)
 {
     this->line = gpiod_line_new(pin);
     if (!this->line)
     {
-        std::cerr << "ERROR, Line for pin" << std::to_string(pin) << "is null\n";
+        std::cerr << "ERROR, Line for pin " << std::to_string(pin) << "is null\n";
         return;
     }
     /* Configure output */
