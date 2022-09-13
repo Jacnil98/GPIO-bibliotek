@@ -21,16 +21,14 @@ static void led_controll(std::vector<GPIO*> &leds, GPIO &button, const std::size
  */
 int main(void)
 {
-    // GPIO led1, led2, led3, led4, button1, button2;
-
     /* Creates object of GPIO class  */
-    GPIO led1(GPIO_enum::direction::output, 17, "led1", GPIO_enum::activeSignal::high, GPIO_enum::event::falling, 0);
-    GPIO led2(GPIO_enum::direction::output, 22, "led2", GPIO_enum::activeSignal::high, GPIO_enum::event::falling, 0);
-    GPIO led3(GPIO_enum::direction::output, 23, "led3", GPIO_enum::activeSignal::high, GPIO_enum::event::falling, 0);
-    GPIO led4(GPIO_enum::direction::output, 24, "led4", GPIO_enum::activeSignal::high, GPIO_enum::event::falling, 0);
+    GPIO led1(GPIO_enum::direction::output, 17, "led1");
+    GPIO led2(GPIO_enum::direction::output, 22, "led2");
+    GPIO led3(GPIO_enum::direction::output, 23, "led3");
+    GPIO led4(GPIO_enum::direction::output, 24, "led4");
 
-    GPIO button1(GPIO_enum::direction::input, 27, "button1", GPIO_enum::activeSignal::high, GPIO_enum::event::rising, 0);
-    GPIO button2(GPIO_enum::direction::input, 5, "button2", GPIO_enum::activeSignal::high, GPIO_enum::event::rising, 0);
+    GPIO button1(GPIO_enum::direction::input, 27, "button1");
+    GPIO button2(GPIO_enum::direction::input, 5, "button2");
 
     std::vector<GPIO*> leds1 =
     {
