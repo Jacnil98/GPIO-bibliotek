@@ -1,7 +1,9 @@
 #include "header.hpp"
 
-static void led_controll(std::vector<GPIO*> &leds, GPIO &button, const std::size_t blink_delay);
-
+static void led_controll(std::vector<GPIO *> &leds, GPIO &button, const std::size_t blink_delay);
+static void keyboard_process(key_sel &selection, size_t &delay_time);
+static void led_process(std::vector<GPIO *> &leds, key_sel &selection, std::size_t &delay_time);
+static void display_menu();
 /**
  * @authors Jacob Nilsson & Jacob Lundkvist.
  *
@@ -13,10 +15,7 @@ static void led_controll(std::vector<GPIO*> &leds, GPIO &button, const std::size
 
 /** --------------------------------------------------------------------------
  * @brief  KVAR ATT GÖRA:
- *
- * Se möjligheter att implementera class i en vektor utan att anropa destruktor.
- * 09-12 .. Anropar inte destruktor men lyckas inte komma åt indexering av vector och sedan tända led
- * med hjälp av leds[i].blink(delay_time);
+
  ** --------------------------------------------------------------------------
  */
 int main(void)
@@ -30,22 +29,30 @@ int main(void)
     GPIO button1(GPIO_enum::direction::input, 27, "button1");
     GPIO button2(GPIO_enum::direction::input, 5, "button2");
 
-    std::vector<GPIO*> leds1 =
-    {
+    std::size_t delay_time = 0;
+
+    std::vector<GPIO *> leds_g1 =
+        {
+            &led1,
+            &led2};
+
+    std::vector<GPIO *> leds_g2 =
+        {
+            &led3,
+            &led4};
+
+    std::vector<GPIO *> leds{
         &led1,
-        &led2
-    };
-
-    std::vector<GPIO*> leds2 =
-    {
+        &led2,
         &led3,
-        &led4
-    };
+        &led4};
 
-    std::thread t1(&led_controll, std::ref(leds1), std::ref(button1), 1);
-    std::thread t2(&led_controll, std::ref(leds2), std::ref(button2), 5);
+    std::thread t1(&led_controll, std::ref(leds_g1), std::ref(button1), 1);
+    std::thread t2(&led_controll, std::ref(leds_g2), std::ref(button2), 5);
+    display_menu();
     t1.join();
     t2.join();
+    display_menu();
 
     while (true)
     {
@@ -61,7 +68,7 @@ int main(void)
  * On every rising edge the mode is gonna switch.
  *
  */
-static void led_controll(std::vector<GPIO*> &leds, GPIO &button, const std::size_t blink_delay)
+static void led_controll(std::vector<GPIO *> &leds, GPIO &button, const std::size_t blink_delay)
 {
     while (true)
     {
@@ -76,11 +83,91 @@ static void led_controll(std::vector<GPIO*> &leds, GPIO &button, const std::size
                 if (button.read_input())
                     button.value = !button.value;
                 (*leds[i]).blink(blink_delay);
-                if (button.read_input())
-                    button.value = !button.value;
-                (*leds[i]).blink(blink_delay);
             }
         }
     }
     return;
+}
+
+static void keyboard_process(key_sel &selection, size_t &delay_time)
+{
+    std::uint8_t choice;
+    while(true)
+    {
+        display_menu();
+        std::cout << "Enter your choice (1-4): ";
+        std::cin >> choice;
+        switch (choice)
+        {
+            case 1: selection = key_sel::OFF;
+            case 2: selection = key_sel::ON;
+            case 3: selection = key_sel::TOGGLE;
+            case 4: 
+            {
+                std::cout << "You've selected blink, select delay time between blinks\n";
+                std::cout << "number entered is one tenth of a second\n";
+                std::cout << "Recommended(10 for 1 between blinks): ";
+                std::cin >> delay_time;
+                std::cout << "\n";
+
+                while(delay_time == 0)
+                {
+                    std::cout << "\nNot a valid number try again: ";
+                    std::cin >> delay_time;
+                }
+                selection = key_sel::BLINK;
+
+            }
+            
+        }
+    }
+}
+
+static void led_process(std::vector<GPIO *> &leds, key_sel &selection, std::size_t &delay_time)
+{
+    /* for (uint8_t i = 0; i < (end(leds) - begin(leds)); i++) */
+    while (true)
+    {
+       switch (selection)
+       {
+            case key_sel::NOTHING: 
+            {
+                continue;
+            }
+            case key_sel::OFF: 
+            {
+                for (uint8_t i = 0; i < (end(leds) - begin(leds)); i++)
+                    (*leds[i]).off();
+                selection = key_sel::NOTHING;
+            }
+            case key_sel::ON: 
+            {
+                for (uint8_t i = 0; i < (end(leds) - begin(leds)); i++)
+                    (*leds[i]).on();
+                selection = key_sel::NOTHING;
+            }
+            case key_sel::TOGGLE: 
+            {
+                for (uint8_t i = 0; i < (end(leds) - begin(leds)); i++)
+                    (*leds[i]).toggle();
+                selection = key_sel::NOTHING;
+            }
+            case key_sel::BLINK: 
+            {
+                for (uint8_t i = 0; i < (end(leds) - begin(leds)); i++)
+                    (*leds[i]).blink(delay_time);
+            }
+       }
+    }
+}
+
+static void display_menu()
+{
+    std::cout << "===================================\n\n";
+    std::cout << "\tLED CONTROL MENU\n\n";
+    std::cout << "===================================\n";
+    std::cout << "1. LEDS OFF\n";
+    std::cout << "2. LEDS ON\n";
+    std::cout << "3. LEDS TOGGLE\n";
+    std::cout << "4. LEDS BLINK\n";
 }

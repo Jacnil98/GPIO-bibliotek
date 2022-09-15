@@ -7,5 +7,15 @@
 
 /* Global objects of GPIO class. */
 
+enum class key_sel
+{
+    NOTHING,
+    OFF,
+    ON,
+    TOGGLE,
+    BLINK,
+    CREDITS
+};
+
 
 #endif /* _HEADER_HPP_ */
