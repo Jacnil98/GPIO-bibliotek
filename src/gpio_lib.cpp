@@ -77,24 +77,29 @@ GPIO::GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, cons
  * @brief Detectes if a input changed state.
  *
  */
-bool GPIO::read_input()
+bool GPIO::read()
 {
-    const auto old_value = this->last_value;
-    const auto current_value = gpiod_line_get_value(this->line);
-    this->last_value = current_value;
-    if (current_value == old_value)
-        return false;
-    usleep(50000);
-    if (this->event_detection == GPIO_enum::event::rising && current_value && !old_value)
-    {
-        return true;
-    }
-    else if (this->event_detection == GPIO_enum::event::falling && !current_value && old_value)
-        return true;
-    else if (this->event_detection == GPIO_enum::event::both && current_value != old_value)
-        return true;
+    if (this->direction == GPIO_enum::direction::output)
+        return gpiod_line_get_value(this->line);
     else
-        return false;
+    {
+        const auto old_value = this->last_value;
+        const auto current_value = gpiod_line_get_value(this->line);
+        this->last_value = current_value;
+        if (current_value == old_value)
+            return false;
+        usleep(50000);
+        if (this->event_detection == GPIO_enum::event::rising && current_value && !old_value)
+        {
+            return true;
+        }
+        else if (this->event_detection == GPIO_enum::event::falling && !current_value && old_value)
+            return true;
+        else if (this->event_detection == GPIO_enum::event::both && current_value != old_value)
+            return true;
+        else
+            return false;
+    }
 }
 
 /**

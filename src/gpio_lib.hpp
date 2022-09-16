@@ -65,7 +65,7 @@ public:
       gpiod_line_release(this->line);
    }
 
-   bool read_input();
+   bool read();
    void blink(const uint16_t blink_speed);
    void on();
    void off();
