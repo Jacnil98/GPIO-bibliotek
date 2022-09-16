@@ -2,6 +2,7 @@
 #define _HEADER_HPP_
 
 /* Include directives */
+
 #include <vector>
 #include "gpio_lib.hpp"
 
@@ -17,6 +18,7 @@ enum key_selection
 };
 
 /* Const expressions for pins */
+
 constexpr uint8_t led1_pin = 17;
 constexpr uint8_t led2_pin = 22;
 constexpr uint8_t led3_pin = 23;

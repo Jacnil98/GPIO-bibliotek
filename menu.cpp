@@ -2,8 +2,9 @@
 #include "header.hpp"
 
 /**
- * @brief Displays the interface to the user
- *  
+ * @brief @brief Displays the interface to the user.
+ * 
+ * @return uint8_t - grabs input from user in terminal.
  */
 uint8_t display_menu()
 {
@@ -36,11 +37,11 @@ uint16_t get_number(uint16_t min_val, uint16_t max_val)
         {
             std::cin.clear();
             std::cin.ignore(1000, '\n');
-            std::cout << "Incorrect input\nGive it another go: ";
+            std::cout << "\nIncorrect input\nGive it another go: ";
         }
         else if (val < min_val || val > max_val)
         {
-            std::cout << "Value not in range\nGive it another go: ";
+            std::cout << "\nValue not in range\nGive it another go: ";
         }
         else
         {

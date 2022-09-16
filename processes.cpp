@@ -2,10 +2,8 @@
 #include "header.hpp"
 
 /**
- * @brief
- * @details Connects four leds to PIN 17, 22, 23 and 24 and two buttons to PIN 25 and 27.
- * The two buttons is gonna controll two leds each with the help of a thread. The leds are gonna switch between blinking and be off.
- * On every rising edge the mode is gonna switch.
+ * @brief controls a vector of GPIO objects through GPIO input.
+ * blink_delay is 1/10 second.
  *
  */
 void led_controll(std::vector<GPIO *> &leds, GPIO &button, const std::size_t blink_delay)
@@ -30,9 +28,9 @@ void led_controll(std::vector<GPIO *> &leds, GPIO &button, const std::size_t bli
 }
 
 /**
- * @brief Switches between the different led states.
+ * @brief Switches between the different led states depending on enum selection for
+ * the GPIO output vector.
  * 
- * @details 
  */
 void led_process(std::vector<GPIO *> &leds, key_selection &selection, std::size_t &delay_time)
 {
@@ -40,50 +38,44 @@ void led_process(std::vector<GPIO *> &leds, key_selection &selection, std::size_
     {
        switch (selection)
        {
-            case NOTHING:
-            {
-                continue;
-            }
-            case OFF:
-            {
-                for (ALL_LEDS)
-                    (*leds[i]).off();
-                selection = NOTHING;
-                break;
-            }
-            case ON:
-            {
-                for (ALL_LEDS)
-                    (*leds[i]).on();
-                selection = NOTHING;
-                break;
-            }
-            case TOGGLE:
-            {
-                for (ALL_LEDS)
-                    (*leds[i]).toggle();
-                selection = NOTHING;
-                break;
-            }
-            case BLINK:
-            {
-                for (ALL_LEDS)
-                    (*leds[i]).blink(delay_time);
-            }
-            }
+        case NOTHING:
+            continue;
+        case OFF:
+            for (ALL_LEDS)
+                (*leds[i]).off();
+            selection = NOTHING;
+            break;
+
+        case ON:
+            for (ALL_LEDS)
+                (*leds[i]).on();
+            selection = NOTHING;
+            break;
+
+        case TOGGLE:
+            for (ALL_LEDS)
+                (*leds[i]).toggle();
+            selection = NOTHING;
+            break;
+
+        case BLINK:
+            for (ALL_LEDS)
+                (*leds[i]).blink(delay_time);
+        }
     }
 }
 
 /**
- * @brief Switches led state with the help of the keyboard
+ * @brief Updates the variable selection and delay_time depending
+ * on keyboard input from terminal.
  * 
- * @details
  */
 void keyboard_process(key_selection &selection, size_t &delay_time)
 {
     std::uint8_t choice;
     while (true)
     {
+        std::system("clear");
         choice = display_menu();
 
         switch (choice)

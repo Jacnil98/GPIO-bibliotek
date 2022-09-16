@@ -9,7 +9,10 @@
 #include <unistd.h>
 
 /**
- * @brief
+ * @brief enumerations for gpio_lib
+ * @param event rising, falling, both edges of input event.
+ * @param direction input or output component.
+ * @param activeSignal active_high or active_low
  *
  */
 namespace GPIO_enum
@@ -39,6 +42,8 @@ namespace GPIO_enum
  *
  * @param direction The direction of the Pin.
  * @param event_detection Edge detection defintion.
+ * @param last_value (output) Used in event detection.
+ * @param value (output) Used for toggling, if event is detected.
  */
 class GPIO
 {
@@ -48,19 +53,17 @@ private:
    GPIO_enum::event event_detection = GPIO_enum::event::rising;
    uint8_t last_value = 0;
 
-public: /* Medlemsfunktioner: */
+public:
    bool value = 0; 
-        /* GPIO-linjepekare. */
    GPIO(void) {}
-   ~GPIO(void) /* Destructor */
+   GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias = nullptr,
+        GPIO_enum::activeSignal active_signal = GPIO_enum::activeSignal::high, 
+        const GPIO_enum::event event_detection = GPIO_enum::event::rising, bool default_val = 0);
+   ~GPIO(void)
    {
       std::cout << "Destructor called for" << this->line;
       gpiod_line_release(this->line);
    }
-
-   GPIO(const GPIO_enum::direction IO_direction, const std::uint8_t pin, const char *alias = nullptr,
-        GPIO_enum::activeSignal active_signal = GPIO_enum::activeSignal::high, 
-        const GPIO_enum::event event_detection = GPIO_enum::event::rising, bool default_val = 0);
 
    bool read_input();
    void blink(const uint16_t blink_speed);
