@@ -1,3 +1,4 @@
+/* Include directives */
 #include "gpio_lib.hpp"
 
 static gpiod_line *gpiod_line_new(const std::uint8_t pin);
