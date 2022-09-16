@@ -30,21 +30,25 @@ int main(void)
     GPIO button2(GPIO_enum::direction::input, btn2_pin, "button2");
     std::size_t delay_time = 0;
     key_selection selection = NOTHING;
-    std::vector<GPIO *> led_group1 =
-        {
-            &led1,
-            &led2};
+    std::vector<GPIO *> led_group1
+    {
+        &led1,
+        &led2
+    };
 
-    std::vector<GPIO *> led_group2 =
-        {
-            &led3,
-            &led4};
+    std::vector<GPIO *> led_group2
+    {
+        &led3,
+        &led4
+    };
 
-    std::vector<GPIO *> leds{
+    std::vector<GPIO *> leds
+    {
         &led1,
         &led2,
         &led3,
-        &led4};
+        &led4
+    };
 
     std::thread t1(&led_controll, std::ref(led_group1), std::ref(button1), 1);
     std::thread t2(&led_controll, std::ref(led_group2), std::ref(button2), 5);

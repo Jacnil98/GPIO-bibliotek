@@ -8,6 +8,7 @@
  */
 uint8_t display_menu()
 {
+    std::system("clear");
     std::cout << "\n\n====================================\n\n";
     std::cout << "\t  LED CONTROL MENU\n\n";
     std::cout << "====================================\n";

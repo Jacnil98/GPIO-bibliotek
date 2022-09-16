@@ -10,7 +10,7 @@ void led_controll(std::vector<GPIO *> &leds, GPIO &button, const std::size_t bli
 {
     while (true)
     {
-        if (button.read_input())
+        if (button.read())
         {
             button.value = !button.value;
         }
@@ -18,7 +18,7 @@ void led_controll(std::vector<GPIO *> &leds, GPIO &button, const std::size_t bli
         {
             for (uint8_t i = 0; i < (end(leds) - begin(leds)); i++)
             {
-                if (button.read_input())
+                if (button.read())
                     button.value = !button.value;
                 (*leds[i]).blink(blink_delay);
             }
@@ -75,7 +75,6 @@ void keyboard_process(key_selection &selection, size_t &delay_time)
     std::uint8_t choice;
     while (true)
     {
-        std::system("clear");
         choice = display_menu();
 
         switch (choice)
